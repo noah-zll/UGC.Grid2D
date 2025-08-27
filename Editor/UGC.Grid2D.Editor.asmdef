@@ -1,0 +1,18 @@
+{
+    "name": "UGC.Grid2D.Editor",
+    "rootNamespace": "UGC.Grid2D.Editor",
+    "references": [
+        "GUID:6c7e12f19a0b33047847e370e636f701"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

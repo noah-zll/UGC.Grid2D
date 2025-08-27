@@ -1,0 +1,35 @@
+{
+  "name": "com.ugc.grid2d",
+  "version": "1.0.0",
+  "displayName": "UGC.Grid2D",
+  "description": "Unity 2D Grid Component - A flexible and performant grid rendering system for Unity 2D scenes with customizable grid size, display area, and edge fade effects.",
+  "unity": "2021.3",
+  "unityRelease": "0f1",
+  "keywords": [
+    "grid",
+    "2d",
+    "rendering",
+    "visualization",
+    "editor",
+    "tool"
+  ],
+  "author": {
+    "name": "UGC",
+    "email": "support@ugc.com",
+    "url": "https://github.com/ugc"
+  },
+  "category": "2D",
+  "dependencies": {},
+  "samples": [
+    {
+      "displayName": "Basic Grid Demo",
+      "description": "Basic grid rendering example",
+      "path": "Samples~/Basic Grid"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ugf/UGC.Grid2D.git"
+  },
+  "license": "MIT"
+}
