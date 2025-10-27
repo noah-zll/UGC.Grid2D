@@ -45,7 +45,7 @@ Shader "UGC/Grid2D/Grid2D"
             ZTest [_ZTest]
             Cull [_Cull]
             
-            CGPROGRAM
+            HLSLPROGRAM
             #pragma vertex vert
             #pragma fragment frag
             #pragma multi_compile_fog
@@ -189,7 +189,7 @@ Shader "UGC/Grid2D/Grid2D"
                 
                 return col;
             }
-            ENDCG
+            ENDHLSL
         }
     }
     
@@ -211,7 +211,7 @@ Shader "UGC/Grid2D/Grid2D"
             ZTest LEqual
             Cull Off
             
-            CGPROGRAM
+            HLSLPROGRAM
             #pragma vertex vert_simple
             #pragma fragment frag_simple
             #include "UnityCG.cginc"
@@ -245,7 +245,7 @@ Shader "UGC/Grid2D/Grid2D"
                 col.a *= _Alpha;
                 return col;
             }
-            ENDCG
+             ENDHLSL
         }
     }
     
