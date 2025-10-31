@@ -34,6 +34,7 @@ namespace UGC.Grid2D
         
         [Header("渲染设置")]
         [SerializeField] private int _sortingOrder = 0;
+        [SerializeField] private int _sortingLayerID = 0;
         [SerializeField] private string _sortingLayerName = "Default";
         [SerializeField] private bool _antiAliasing = true;
         [SerializeField] private bool _smoothLines = true;
@@ -53,6 +54,10 @@ namespace UGC.Grid2D
         private Camera _currentCamera;
         private Vector3 _lastCameraPosition;
         private float _lastCameraSize;
+        
+        // 渲染组件
+        private MeshRenderer _meshRenderer;
+        private MeshFilter _meshFilter;
         
         // 属性访问器
         public Vector2 gridSize
@@ -203,6 +208,19 @@ namespace UGC.Grid2D
                 if (_sortingOrder != value)
                 {
                     _sortingOrder = value;
+                    UpdateMaterialProperties();
+                }
+            }
+        }
+        
+        public int sortingLayerID
+        {
+            get => _sortingLayerID;
+            set
+            {
+                if (_sortingLayerID != value)
+                {
+                    _sortingLayerID = value;
                     UpdateMaterialProperties();
                 }
             }
@@ -391,6 +409,9 @@ namespace UGC.Grid2D
                 _fadeCurve = AnimationCurve.EaseInOut(0, 1, 1, 0);
             }
             
+            // 初始化渲染组件
+            InitializeRenderComponents();
+            
             // 确保材质被正确初始化
             UpdateMaterialProperties();
         }
@@ -417,8 +438,46 @@ namespace UGC.Grid2D
             
             _gridMesh = _meshGenerator.GenerateMesh(gridData);
             
+            // 将网格分配给MeshFilter
+            if (_meshFilter != null && _gridMesh != null)
+            {
+                _meshFilter.mesh = _gridMesh;
+            }
+            
             // 创建或更新材质
             UpdateMaterialProperties();
+        }
+        
+        private void InitializeRenderComponents()
+        {
+            // 获取或创建MeshFilter组件
+            if (_meshFilter == null)
+            {
+                _meshFilter = GetComponent<MeshFilter>();
+                if (_meshFilter == null)
+                {
+                    _meshFilter = gameObject.AddComponent<MeshFilter>();
+                }
+            }
+            
+            // 获取或创建MeshRenderer组件
+            if (_meshRenderer == null)
+            {
+                _meshRenderer = GetComponent<MeshRenderer>();
+                if (_meshRenderer == null)
+                {
+                    _meshRenderer = gameObject.AddComponent<MeshRenderer>();
+                }
+            }
+            
+            // 设置渲染器属性
+            if (_meshRenderer != null)
+            {
+                _meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                _meshRenderer.receiveShadows = false;
+                _meshRenderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
+                _meshRenderer.reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
+            }
         }
         
         private void UpdateMaterialProperties()
@@ -434,6 +493,7 @@ namespace UGC.Grid2D
                 fadeCurve = _fadeCurve,
                 displayArea = _displayArea,
                 sortingOrder = _sortingOrder,
+                sortingLayerID = _sortingLayerID,
                 sortingLayerName = _sortingLayerName,
                 antiAliasing = _antiAliasing,
                 smoothLines = _smoothLines
@@ -441,6 +501,22 @@ namespace UGC.Grid2D
             
             _materialManager = Grid2DMaterial.GetOrCreate(properties);
             _gridMaterial = _materialManager.Material;
+            
+            // 更新MeshRenderer的材质和排序层
+            UpdateRendererProperties();
+        }
+        
+        private void UpdateRendererProperties()
+        {
+            if (_meshRenderer == null || _gridMaterial == null) return;
+            
+            // 设置材质
+            _meshRenderer.material = _gridMaterial;
+            
+            // 设置排序层
+            _meshRenderer.sortingLayerID = _sortingLayerID;
+            _meshRenderer.sortingLayerName = _sortingLayerName;
+            _meshRenderer.sortingOrder = _sortingOrder;
         }
         
         private void CheckCameraChanges()
@@ -496,6 +572,18 @@ namespace UGC.Grid2D
                     DestroyImmediate(_gridMaterial);
             }
             
+            // 清理MeshFilter
+            if (_meshFilter != null)
+            {
+                _meshFilter.mesh = null;
+            }
+            
+            // 禁用MeshRenderer
+            if (_meshRenderer != null)
+            {
+                _meshRenderer.enabled = false;
+            }
+            
             _meshGenerator?.Dispose();
             _materialManager?.Dispose();
         }
@@ -513,6 +601,14 @@ namespace UGC.Grid2D
         private void RenderGrid()
         {
             if (!isActiveAndEnabled) return;
+            
+            // 确保渲染组件已初始化
+            if (_meshRenderer == null || _meshFilter == null)
+            {
+                if (_showDebugInfo)
+                    Debug.LogWarning("Grid2DRenderer: Render components not initialized, initializing...", this);
+                InitializeRenderComponents();
+            }
             
             // 确保网格和材质都已初始化
             if (_gridMesh == null)
@@ -536,8 +632,11 @@ namespace UGC.Grid2D
                 return;
             }
             
-            // 使用Graphics.DrawMesh进行渲染
-            Graphics.DrawMesh(_gridMesh, transform.localToWorldMatrix, _gridMaterial, gameObject.layer);
+            // 确保MeshRenderer启用
+            if (_meshRenderer != null)
+            {
+                _meshRenderer.enabled = true;
+            }
         }
         
         /// <summary>
@@ -568,6 +667,7 @@ namespace UGC.Grid2D
             _maxGridLines = 1000;
             _dynamicUpdate = true;
             _sortingOrder = 0;
+            _sortingLayerID = 0;
             _sortingLayerName = "Default";
             _antiAliasing = true;
             _smoothLines = true;

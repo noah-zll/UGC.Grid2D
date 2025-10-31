@@ -295,6 +295,7 @@ namespace UGC.Grid2D
         public AnimationCurve fadeCurve;
         public Vector2 displayArea;
         public int sortingOrder;
+        public int sortingLayerID;
         public string sortingLayerName;
         public bool antiAliasing;
         public bool smoothLines;
